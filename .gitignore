@@ -1,0 +1,6 @@
+# Ignore files for the cfn_lamda_j2processor repo
+.pyc
+.DS_Store
+.*.swp
+compile/*
+cfn-lambda-j2processor.zip

@@ -1,0 +1,24 @@
+[submodule "modules/botocore"]
+	path = modules/botocore
+	url = https://github.com/boto/botocore.git
+[submodule "modules/cfnlambda"]
+	path = modules/cfnlambda
+	url = https://github.com/gene1wood/cfnlambda.git
+[submodule "modules/dateutil"]
+	path = modules/dateutil
+	url = https://github.com/dateutil/dateutil.git
+[submodule "modules/jinja"]
+	path = modules/jinja
+	url = https://github.com/pallets/jinja.git
+[submodule "modules/jmespath.py"]
+	path = modules/jmespath.py
+	url = https://github.com/jmespath/jmespath.py.git
+[submodule "modules/markupsafe"]
+	path = modules/markupsafe
+	url = https://github.com/pallets/markupsafe.git
+[submodule "modules/s3transfer"]
+	path = modules/s3transfer
+	url = https://github.com/boto/s3transfer.git
+[submodule "modules/boto3"]
+	path = modules/boto3
+	url = https://github.com/boto/boto3.git

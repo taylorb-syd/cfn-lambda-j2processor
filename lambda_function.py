@@ -128,6 +128,6 @@ def lambda_handler(event, context):
     logger.info("Returning result file path under TemplateS3Url Attribute")
     returnValue = {}
     
-    returnValue['TemplateS3Url'] = 'https://s3-' + S3BucketLocation + '.s3.amazonaws.com/' + S3Bucket + '/' + S3FileName
+    returnValue['TemplateS3Url'] = 'https://s3-' + S3BucketLocation + '.amazonaws.com/' + S3Bucket + '/' + S3FileName
     return returnValue 
 

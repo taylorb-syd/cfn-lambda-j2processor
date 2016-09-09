@@ -7,9 +7,9 @@ git submodule update
 mkdir -p compile
 rm -fdr compile/*
 cp -r lambda_function.py compile/
+cp -r cfnlambda.py compile/
 cp -r modules/boto3/boto3 compile/
 cp -r modules/botocore/botocore compile/
-cp -r modules/cfnlambda/cfnlambda.py compile/
 cp -r modules/dateutil/dateutil compile/
 cp -r modules/jinja/jinja2 compile/
 cp -r modules/jmespath.py/jmespath compile/

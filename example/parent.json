@@ -1,0 +1,173 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This is an example template. To operate it expects child.json.j2, and the zip file produced by setup.py under the key of example/ of an S3 bucket. This will create a security group and then add ingress rules for SSH (default) from an arbitrary length list of comma seperated CIDRs.",
+    "Parameters" : {
+        "CidrList" : {
+            "Description" : "Comma seperated list of CIDRs.",
+            "Type" : "String",
+            "MinLength": "9",
+            "AllowedPattern": "((\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2}),)*(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+            "ConstraintDescription": "must a comma delimited list of valid IP CIDR ranges",
+            "Default": "192.0.2.0/24,198.51.100.0/24,203.0.113.0/24"
+        },
+        "ToPort" : {
+            "Description" : "End of port range for the TCP and UDP protocols, or an ICMP code. -1 is wildcard for ICMP.",
+            "Type" : "Number",
+            "MinValue" : "-1",
+            "MaxValue" : "65535",
+            "ConstraintDescripton": "must be a valid port number (between 0 and 65535) or -1 for wildcard",
+            "Default": "22"
+        },
+        "FromPort" : {
+            "Description" : "Start of port range for the TCP and UDP protocols, or an ICMP type number. -1 is wildcard for ICMP.",
+            "Type" : "Number",
+            "MinValue" : "-1",
+            "MaxValue" : "65535",
+            "ConstraintDescripton": "must be a valid port number (between 0 and 65535) or -1 for wildcard",
+            "Default": "22"
+        },
+        "IpProtocol" : {
+            "Description": "IP protocol name or number.",
+            "Type" : "String",
+            "AllowedPattern": "tcp|udp|icmp|[01]\d{2}|2[0-4]\d|25[0-5]|\d{1}|\d{2}",
+            "ConstraintDescription" : "must be a valid protocol number (0-255), tcp, udp, or icmp",
+            "Default" : "tcp"
+        },
+        "BucketName" : {
+            "Description": "S3 Bucket where child.json.j2 and cfn-lambda-j2processor.zip are located. This bucket must be in the same region as the CFN Template.",
+            "Type" : "String"
+        },
+        "BucketPrefix" : {
+            "Description" : "The key prefix (or folder) where child.json.j2 and cfn-lamda-j2processor.zip are located.",
+            "Type" : "String",
+            "Default" : "example/"
+        },
+        "ZipFileName" : {
+            "Description" : "The name of the zip file object in S3.",
+            "Type" : "String",
+            "Default" : "cfn-lambda-j2processor.zip"
+        },
+        "J2FileName" : {
+            "Description" : "The name of the j2 tempalte file object in S3.",
+            "Type" : "String",
+            "Default" : "child.json.j2"
+        }
+    },
+    "Resources" : {
+        "LamdbaFunctionIAMRole" : {
+            "Type" : "AWS::IAM::Role",
+            "Properties" : {
+                "AssumeRolePolicyDocument" : {
+                    "Version" : "2012-10-17",
+                    "Statement" : [{
+                        "Effect" : "Allow",
+                        "Action" : [ "sts:AssumeRole" ],
+                        "Principal" : { "Service" : [ "lambda.amazonaws.com "]}
+                    }]
+                }
+            }
+        },
+        "LambdaFunctionIAMPolicy" : {
+            "Type": : "AWS::IAM::Policy",
+            "Properties" : {
+                "Roles" : [{ "Ref" : "LambdaFunctionIAMRole" }],
+                "PolicyName" : "S3BucketAndLogsAccessforLambda",
+                "PolicyDocument" : {
+                    "Version" : "2012-10-17",
+                    "Statement" : [
+                        {
+                            "Action" : [
+                                "logs:CreateLogGroup",
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Effect" : "Allow",
+                            "Resource" : "arn:aws:logs:*:*:*"
+                        },
+                        {
+                            "Action" : [ "s3:GetObject" ],
+                            "Effect" : "Allow",
+                            "Resource" : { "Fn::Join"  : [ "", [
+                                "arn:aws:s3:::", { "Ref" : "BucketName" },
+                                "/", { "Ref" : "BucketPrefix" },
+                                { "Ref" : "J2FileName" } 
+                            ]]}
+                        },
+                        {
+                            "Action" : [
+                                "s3:GetObject",
+                                "s3:PutObject",
+                                "s3:DeleteObject"
+                            ],
+                            "Effect" : "allow",
+                            "Resource" : { "Fn::Join" : [ "", [
+                                "arn:aws:s3:::", { "Ref" : "BucketName" },
+                                "/", { "Ref" : "BucketPrefix" }, "*"
+                            ]]}
+                        }
+                    ]
+                }
+            }
+        },
+        "ExampleSecurityGroup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Properties" : {
+                "GroupDescription" : "Example Security Group which the child template will add rules too."
+            }
+        },
+        "LambdaFunction" : {
+            "Type" : "AWS::Lambda::FUnction",
+            "DependsOn" : "LambdaFunctionIAMPolicy",
+            "Properties" : {
+                "Code" : {
+                    "S3Bucket" : { "Ref" : "BucketName" },
+                    "S3Key" : { "Fn::Join" : [ "" [
+                        { "Ref" : "BucketPrefix" },
+                        { "Ref" : "ZipFileName" }
+                    ]]}
+                },
+                "Handler" : "lambda_function.lambda_handler",
+                "MemorySize" : "256",
+                "Role" : { "Fn::GetAtt" : [ "LambdaFunctionIAMRole", "Arn" ]},
+                "Runtime" : "python2.7",
+                "Timeout" : "120"
+            }
+        },
+        "CreateChildTemplate" : {
+            "Type" : "Custom::CreateChild",
+            "DependsOn" : "LambdaFunction",
+            "Properties" : {
+                "ServiceToken" : { "Fn::GetAtt" : [ "LambdaFunction", "Arn" ]},
+                "TemplateS3Bucket" : { "Ref" : "BucketName" },
+                "S3Bucket" : { "Ref" : "BucketName" },
+                "TemplateS3Key" : { "Fn::Join" : [ "" [
+                    { "Ref" : "BucketPrefix" }, { "Ref" : "J2FileName" }
+                ]]},
+                "S3KeyPrefix" : { "Ref" : "BucketPrefix" },
+                "S3Suffix" : "json",
+                "CommaLists" : {
+                    "CidrList" : { "Ref" : "CidrList" }
+                }
+            }
+        },
+        "ChildStack" : {
+            "Type" : "AWS::CloudFormation::Stack",
+            "DependsOn" : "CreateChildTemplate",
+            "Properties" : {
+                "Parameters" : {
+                    "ToPort" : { "Ref" : "ToPort" },
+                    "FromPort" : { "Ref" : "FromPort"},
+                    "IpProtocol" : { "Ref" : "IpProtocol"},
+                    "SourceSecurityGroupId" : { "Fn:GetAtt" : [ "ExampleSecurityGroup", "GroupId" ]}
+                },
+                "TemplateURL" : { "Fn::GetAtt" : [ "CreateChildTemplate", "TemplateS3Url" ]}
+            }
+        }
+    },
+    "Outputs" : {
+        "SecurityGroupId" : {
+            "Description" : "The GroupId of the security group this template creates",
+            "Value" : { "Fn::GetAtt" : [ "ExampleSecurityGroup", "GroupId" ]}
+        }
+    }
+}

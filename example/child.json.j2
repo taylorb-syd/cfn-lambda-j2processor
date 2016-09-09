@@ -1,0 +1,47 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Description" : "Takes in a SecurityGroup GroupId and other rule parameters and produces a set of SecurityGroupIngress Rules",
+    "Paramaters" : {
+        "ToPort" : {
+            "Description" : "End of port range for the TCP and UDP protocols, or an ICMP code. -1 is wildcard for ICMP.",
+            "Type" : "Number",
+            "MinValue" : "-1",
+            "MaxValue" : "65535",
+            "ConstraintDescripton": "must be a valid port number (between 0 and 65535) or -1 for wildcard",
+            "Default": "22"
+        },
+        "FromPort" : {
+            "Description" : "Start of port range for the TCP and UDP protocols, or an ICMP type number. -1 is wildcard for ICMP.",
+            "Type" : "Number",
+            "MinValue" : "-1",
+            "MaxValue" : "65535",
+            "ConstraintDescripton": "must be a valid port number (between 0 and 65535) or -1 for wildcard",
+            "Default": "22"
+        },
+        "IpProtocol" : {
+            "Description": "IP protocol name or number.",
+            "Type" : "String",
+            "AllowedPattern": "tcp|udp|icmp|[01]\d{2}|2[0-4]\d|25[0-5]|\d{1}|\d{2}",
+            "ConstraintDescription" : "must be a valid protocol number (0-255), tcp, udp, or icmp",
+            "Default" : "tcp"
+        },
+        "SourceSecurityGroupId" : {
+            "Description" : "Specifies the ID of the source security group.",
+            "Type" : "AWS::EC2::SecurityGroup::Id"
+        }
+    },
+    "Resources" : {
+        {% for item in CidrList %}
+        "IngressRule{{loop.index}}": {
+            "Type" : "AWS::EC2::SecurityGroupIngress",
+            "Properties" : {
+                "CidrIp" : "{{item}}",
+                "FromPort" : { "Ref" : "FromPort"},
+                "ToPort" : { "Ref" : "ToPort" },
+                "IpProtocol" : { "Ref" : "IpProtocol" },
+                "SourceSecurityGroupId" : { "Ref" : "SourceSecurityGroupId" }
+            }              
+        }
+        {% endfor %} 
+    }
+}

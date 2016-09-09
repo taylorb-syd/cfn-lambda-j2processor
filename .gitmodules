@@ -1,9 +1,6 @@
 [submodule "modules/botocore"]
 	path = modules/botocore
 	url = https://github.com/boto/botocore.git
-[submodule "modules/cfnlambda"]
-	path = modules/cfnlambda
-	url = https://github.com/gene1wood/cfnlambda.git
 [submodule "modules/dateutil"]
 	path = modules/dateutil
 	url = https://github.com/dateutil/dateutil.git

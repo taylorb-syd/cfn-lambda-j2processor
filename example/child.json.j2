@@ -40,8 +40,8 @@
                 "ToPort" : { "Ref" : "ToPort" },
                 "IpProtocol" : { "Ref" : "IpProtocol" },
                 "SourceSecurityGroupId" : { "Ref" : "SourceSecurityGroupId" }
-            }{% if not loop.last %},{% endif %}              
-        }
+            }
+        }{% if not loop.last %},{% endif %}
         {% endfor %} 
     }
 }

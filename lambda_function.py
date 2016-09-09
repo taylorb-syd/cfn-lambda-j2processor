@@ -40,6 +40,9 @@ logging.getLogger().setLevel(logging.INFO)
 @handler_decorator(delete_logs=False)
 def lambda_handler(event, context):
     s3 = awsapi.client('s3')
+    # Get the Bucket Location of the resulting bucket, required for URL Generation.
+    # Doing first to prevent this from causing Artificats to be left in the bucket (so the last operation is "PutObject")
+    S3BucketLocation = s3.get_bucket_location(Bucket=S3Bucket)['LocationConstraint']
     
     # Verify variables and put in useful variable names
     # Harness Literals may not exist, and must be a dict
@@ -124,7 +127,7 @@ def lambda_handler(event, context):
     # Return the Template URL
     logger.info("Returning result file path under TemplateS3Url Attribute")
     returnValue = {}
-    S3BucketLocation = s3.get_bucket_location(Bucket=S3Bucket)['LocationConstraint']
+    
     returnValue['TemplateS3Url'] = 'https://s3' + S3BucketLocation + '.s3.amazonaws.com/' + S3Bucket + '/' + S3FileName
     return returnValue 
 

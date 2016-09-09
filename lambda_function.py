@@ -124,7 +124,7 @@ def lambda_handler(event, context):
     # Return the Template URL
     logger.info("Returning result file path under TemplateS3Url Attribute")
     returnValue = {}
-    S3BucketLocation = s3.get_bucket_location(Bucket=S3Bucket)
+    S3BucketLocation = s3.get_bucket_location(Bucket=S3Bucket)['LocationConstraint']
     returnValue['TemplateS3Url'] = 'https://s3' + S3BucketLocation + '.s3.amazonaws.com/' + S3Bucket + '/' + S3FileName
     return returnValue 
 

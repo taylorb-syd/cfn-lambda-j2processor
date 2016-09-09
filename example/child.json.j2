@@ -39,7 +39,7 @@
                 "FromPort" : { "Ref" : "FromPort"},
                 "ToPort" : { "Ref" : "ToPort" },
                 "IpProtocol" : { "Ref" : "IpProtocol" },
-                "SourceSecurityGroupId" : { "Ref" : "SourceSecurityGroupId" }
+                "GroupId" : { "Ref" : "SourceSecurityGroupId" }
             }
         }{% if not loop.last %},{% endif %}
         {% endfor %} 

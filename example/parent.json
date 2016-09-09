@@ -94,6 +94,14 @@
                             ]]}
                         },
                         {
+                            "Action" : [ "s3:GetBucketLocation" ],
+                            "Effect" : "Allow",
+                            "Resource" : { "Fn::Join" : [ "", [
+                                "arn:aws:s3:::", { "Ref" : "BucketName" },
+                                "/*"
+                            ]]}
+                        },
+                        {
                             "Action" : [
                                 "s3:GetObject",
                                 "s3:PutObject",

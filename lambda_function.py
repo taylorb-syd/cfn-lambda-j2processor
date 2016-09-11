@@ -94,10 +94,6 @@ def lambda_handler(event, context):
     S3Guid = event['StackId'].rsplit('/')[-1]
     S3FileName = S3KeyPrefix + event['LogicalResourceId'] + '-' + S3Guid + S3Suffix
 
-    # Get the Bucket Location of the resulting bucket, required for URL Generation.
-    # Doing first to prevent this from causing Artificats to be left in the bucket (so the last operation is "PutObject")
-    S3BucketLocation = s3.get_bucket_location(Bucket=S3Bucket)['LocationConstraint']
-    
     # If the request type is "Delete" we only need to delete the S3 Object if it exists
     if event['RequestType'] == 'Delete':
         logger.info("Detected stack deletion, deleting object s3://" + S3Bucket,  + "/" + S3FileName)
@@ -128,6 +124,7 @@ def lambda_handler(event, context):
     logger.info("Returning result file path under TemplateS3Url Attribute")
     returnValue = {}
     
-    returnValue['TemplateS3Url'] = 'https://s3-' + S3BucketLocation + '.amazonaws.com/' + S3Bucket + '/' + S3FileName
+    #returnValue['TemplateS3Url'] = 'https://s3-' + S3BucketLocation + '.amazonaws.com/' + S3Bucket + '/' + S3FileName
+    returnValue['TemplateS3Url'] = 'https://' + S3Bucket + '.s3.amazonaws.com/' + S3FileName
     return returnValue 
 

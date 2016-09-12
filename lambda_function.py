@@ -29,7 +29,7 @@
 #          "LogicalResourceId": "MyTestResource"
 #          }
 
-from cfnlambda import handler_decorator
+from cfnlambda import handler_decorator, RequestType
 from jinja2 import Environment as j2Env, FileSystemLoader as j2FileLoader
 import boto3 as awsapi
 import logging
@@ -37,7 +37,7 @@ import logging
 logger = logging.getLogger(__name__)
 logging.getLogger().setLevel(logging.INFO)
 
-@handler_decorator(delete_logs=False)
+@handler_decorator(delete_logs=False,hide_stack_delete_failure=False)
 def lambda_handler(event, context):
     s3 = awsapi.client('s3')
     # Verify variables and put in useful variable names
@@ -95,7 +95,7 @@ def lambda_handler(event, context):
     S3FileName = S3KeyPrefix + event['LogicalResourceId'] + '-' + S3Guid + S3Suffix
 
     # If the request type is "Delete" we only need to delete the S3 Object if it exists
-    if event['RequestType'] == 'Delete':
+    if event['RequestType'] == RequestType.DELETE:
         logger.info("Detected stack deletion, deleting object s3://" + S3Bucket,  + "/" + S3FileName)
         response = s3.delete_object(Bucket=S3Bucket,Key=S3FileName)
         return response

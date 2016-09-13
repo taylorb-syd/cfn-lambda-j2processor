@@ -148,8 +148,7 @@ def cfn_response(event,
                      e.message)
 
 
-def handler_decorator(delete_logs=False,
-                      hide_stack_delete_failure=False):
+def handler_decorator(delete_logs=False):
     """Decorate an AWS Lambda function to add exception handling, emit
     CloudFormation responses and log.
 
@@ -165,15 +164,6 @@ def handler_decorator(delete_logs=False,
             stack deletion to trigger the deletion of the CloudWatch logs that
             were generated. If delete_logs is False or if there is a problem
             during stack deletion, the logs are left in place.
-        hide_stack_delete_failure: A boolean which, when True, will report
-            SUCCESS to CloudFormation when a stack deletion is requested
-            regardless of the success of the AWS Lambda function. This will
-            prevent stacks from being stuck in DELETE_FAILED states but will
-            potentially result in resources created by the AWS Lambda function
-            to remain in existence after stack deletion. If
-            hide_stack_delete_failure is False, an exception in the AWS Lambda
-            function will result in DELETE_FAILED upon an attempt to delete
-            the stack.
 
     Returns:
         A decorated function
@@ -243,16 +233,6 @@ def handler_decorator(delete_logs=False,
                 logger.error(message)
 
             if event['RequestType'] == RequestType.DELETE:
-                if status == Status.FAILED and hide_stack_delete_failure:
-                    message = (
-                        'There may be resources created by the AWS '
-                        'Lambda that have not been deleted and cleaned up '
-                        'despite the fact that the stack status may be '
-                        'DELETE_COMPLETE.')
-                    logger.error(message)
-                    result = message
-                    status = Status.SUCCESS
-
                 if status == Status.SUCCESS and delete_logs:
                     logging.disable(logging.CRITICAL)
                     logs_client = boto3.client('logs')

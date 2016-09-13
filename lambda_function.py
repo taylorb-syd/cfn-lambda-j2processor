@@ -35,7 +35,7 @@ import boto3 as awsapi
 import logging
 
 
-@handler_decorator(delete_logs=False,hide_stack_delete_failure=False)
+@handler_decorator(delete_logs=False)
 def lambda_handler(event, context):
     s3 = awsapi.client('s3')
     logger = logging.getLogger(__name__)

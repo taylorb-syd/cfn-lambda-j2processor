@@ -34,12 +34,13 @@ from jinja2 import Environment as j2Env, FileSystemLoader as j2FileLoader
 import boto3 as awsapi
 import logging
 
-logger = logging.getLogger(__name__)
-logging.getLogger().setLevel(logging.INFO)
 
 @handler_decorator(delete_logs=False,hide_stack_delete_failure=False)
 def lambda_handler(event, context):
     s3 = awsapi.client('s3')
+    logger = logging.getLogger(__name__)
+    logging.getLogger().setLevel(logging.INFO)
+    
     # Verify variables and put in useful variable names
     # Harness Literals may not exist, and must be a dict
     if 'HarnessLiterals' in event['ResourceProperties']:
@@ -96,7 +97,7 @@ def lambda_handler(event, context):
 
     # If the request type is "Delete" we only need to delete the S3 Object if it exists
     if event['RequestType'] == RequestType.DELETE:
-        logger.info("Detected stack deletion, deleting object s3://" + S3Bucket,  + "/" + S3FileName)
+        logger.info("Detected stack deletion, deleting object s3://" + S3Bucket + "/" + S3FileName)
         response = s3.delete_object(Bucket=S3Bucket,Key=S3FileName)
         return response
    

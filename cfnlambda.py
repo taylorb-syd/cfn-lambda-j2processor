@@ -148,8 +148,8 @@ def cfn_response(event,
                      e.message)
 
 
-def handler_decorator(delete_logs=True,
-                      hide_stack_delete_failure=True):
+def handler_decorator(delete_logs=False,
+                      hide_stack_delete_failure=False):
     """Decorate an AWS Lambda function to add exception handling, emit
     CloudFormation responses and log.
 

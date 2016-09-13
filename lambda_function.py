@@ -4,8 +4,8 @@
 #       Jinja2 Template in S3 and uses it to generate a file and file and upload
 #       it to S3. For exmaple, it can generate an iterated child template.
 #   Authour: Taylor Bertie (nightkhaos@gmail.com)
-#   Last Updated: 2016-09-08
-#   Version: 1.1.0
+#   Last Updated: 2016-09-13
+#   Version: 1.0.0
 #   Example Input:
 #        {
 #          "StackId": "arn:aws:cloudformation:us-west-2:EXAMPLE/stack-name/guid",

@@ -19,3 +19,6 @@
 [submodule "modules/boto3"]
 	path = modules/boto3
 	url = https://github.com/boto/boto3.git
+[submodule "modules/cfnlambda"]
+	path = modules/cfnlambda
+	url = https://github.com/NightKhaos/cfnlambda

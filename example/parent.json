@@ -158,7 +158,7 @@
                     "ToPort" : { "Ref" : "ToPort" },
                     "FromPort" : { "Ref" : "FromPort"},
                     "IpProtocol" : { "Ref" : "IpProtocol"},
-                    "SourceSecurityGroupId" : { "Fn::GetAtt" : [ "ExampleSecurityGroup", "GroupId" ]}
+                    "GroupId" : { "Fn::GetAtt" : [ "ExampleSecurityGroup", "GroupId" ]}
                 },
                 "TemplateURL" : { "Fn::GetAtt" : [ "CreateChildTemplate", "TemplateS3Url" ]}
             }

@@ -25,8 +25,8 @@
             "ConstraintDescription" : "must be a valid protocol number (0-255), tcp, udp, or icmp",
             "Default" : "tcp"
         },
-        "SourceSecurityGroupId" : {
-            "Description" : "Specifies the ID of the source security group.",
+        "GroupId" : {
+            "Description" : "Specifies the ID of the security group you wish to modify.",
             "Type" : "AWS::EC2::SecurityGroup::Id"
         }
     },
@@ -39,7 +39,7 @@
                 "FromPort" : { "Ref" : "FromPort"},
                 "ToPort" : { "Ref" : "ToPort" },
                 "IpProtocol" : { "Ref" : "IpProtocol" },
-                "GroupId" : { "Ref" : "SourceSecurityGroupId" }
+                "GroupId" : { "Ref" : "GroupId" }
             }
         }{% if not loop.last %},{% endif %}
         {% endfor %} 

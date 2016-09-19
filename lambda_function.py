@@ -5,7 +5,7 @@
 #       it to S3. For exmaple, it can generate an iterated child template.
 #   Authour: Taylor Bertie (nightkhaos@gmail.com)
 #   Last Updated: 2016-09-13
-#   Version: 1.0.0
+#   Version: 1.0.1
 #   Example Input:
 #        {
 #          "StackId": "arn:aws:cloudformation:us-west-2:EXAMPLE/stack-name/guid",

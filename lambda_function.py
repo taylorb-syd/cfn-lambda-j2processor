@@ -91,9 +91,14 @@ def lambda_handler(event, context):
     else:
         logger.warn('No CommaLists dictionary detected. If you are not iterating over value why do you need this function?')
     
-    # The S3 Resourse Name by convention is bucket: ${S3Bucket}; key: ${S3KeyPrefix}${LogicalResourceId}-${!StackGUID}.${S3Suffix}
-    # Where !StackGUID is the guid at the end of the stack ID.
-    S3Guid = event['PhysicalResourceId'] if 'PhysicalResourceId' in event else uuid().hex
+    # The S3 Resourse Name by convention is bucket: ${S3Bucket}; key: ${S3KeyPrefix}${LogicalResourceId}-${GUID}.${S3Suffix}
+    # Where GUID is a random guid
+    if event['RequestType'] == RequestType.UPDATE:
+        # Force new GUID as we're updating, to allow rollback
+        S3Guid = uuid().hex
+    else:
+        S3Guid = event['PhysicalResourceId'] if 'PhysicalResourceId' in event else uuid().hex
+    
     S3FileName = S3KeyPrefix + event['LogicalResourceId'] + '-' + S3Guid + S3Suffix
 
     # If the request type is "Delete" we only need to delete the S3 Object if it exists

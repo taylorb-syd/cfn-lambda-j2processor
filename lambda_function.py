@@ -33,6 +33,7 @@ from cfnlambda import handler_decorator, RequestType
 from jinja2 import Environment as j2Env, FileSystemLoader as j2FileLoader
 import boto3 as awsapi
 import logging
+from uuid import uuid4 as uuid
 
 
 @handler_decorator(delete_logs=False)
@@ -92,12 +93,12 @@ def lambda_handler(event, context):
     
     # The S3 Resourse Name by convention is bucket: ${S3Bucket}; key: ${S3KeyPrefix}${LogicalResourceId}-${!StackGUID}.${S3Suffix}
     # Where !StackGUID is the guid at the end of the stack ID.
-    S3Guid = event['StackId'].rsplit('/')[-1]
+    S3Guid = event['PhysicalResourceId'] if 'PhyiscalResourceId' in event else str(uuid)
     S3FileName = S3KeyPrefix + event['LogicalResourceId'] + '-' + S3Guid + S3Suffix
 
     # If the request type is "Delete" we only need to delete the S3 Object if it exists
     if event['RequestType'] == RequestType.DELETE:
-        logger.info("Detected stack deletion, deleting object s3://" + S3Bucket + "/" + S3FileName)
+        logger.info("Detected objection deletion request, deleting object s3://" + S3Bucket + "/" + S3FileName)
         response = s3.delete_object(Bucket=S3Bucket,Key=S3FileName)
         return response
    
@@ -127,5 +128,6 @@ def lambda_handler(event, context):
     
     #returnValue['TemplateS3Url'] = 'https://s3-' + S3BucketLocation + '.amazonaws.com/' + S3Bucket + '/' + S3FileName
     returnValue['TemplateS3Url'] = 'https://' + S3Bucket + '.s3.amazonaws.com/' + S3FileName
+    returnValue['PhysicalResourceId'] = S3Guid
     return returnValue 
 

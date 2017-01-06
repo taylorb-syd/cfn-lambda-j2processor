@@ -16,6 +16,7 @@ cp -r modules/jmespath.py/jmespath compile/
 cp -r modules/markupsafe/markupsafe compile/
 cp -r modules/s3transfer/s3transfer compile/
 cd compile
+python -m compileall -f .
 zip -9r $ZIPNAME *
 mv $ZIPNAME $DIR/
 cd $DIR

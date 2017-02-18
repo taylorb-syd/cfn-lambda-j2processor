@@ -4,8 +4,8 @@
 #       Jinja2 Template in S3 and uses it to generate a file and file and upload
 #       it to S3. For exmaple, it can generate an iterated child template.
 #   Authour: Taylor Bertie (nightkhaos@gmail.com)
-#   Last Updated: 2016-09-13
-#   Version: 1.0.1
+#   Last Updated: 2017-02-18
+#   Version: 1.2.0
 #   Example Input:
 #        {
 #          "StackId": "arn:aws:cloudformation:us-west-2:EXAMPLE/stack-name/guid",
@@ -29,14 +29,15 @@
 #          "LogicalResourceId": "MyTestResource"
 #          }
 
-from cfnlambda import handler_decorator, RequestType
+from cfnresponse_decorator import cfnresponse_decorator, RequestType, ResponseObject
 from jinja2 import Environment as j2Env, FileSystemLoader as j2FileLoader
 import boto3 as awsapi
 import logging
 from uuid import uuid4 as uuid
 
 
-@handler_decorator(delete_logs=False)
+#@handler_decorator(delete_logs=False)
+@cfnresponse_decorator(enforceUseOfClass=True)
 def lambda_handler(event, context):
     s3 = awsapi.client('s3')
     logger = logging.getLogger(__name__)
@@ -129,10 +130,7 @@ def lambda_handler(event, context):
 
     # Return the Template URL
     logger.info("Returning result file path under TemplateS3Url Attribute")
-    returnValue = {}
     
-    #returnValue['TemplateS3Url'] = 'https://s3-' + S3BucketLocation + '.amazonaws.com/' + S3Bucket + '/' + S3FileName
-    returnValue['TemplateS3Url'] = 'https://' + S3Bucket + '.s3.amazonaws.com/' + S3FileName
-    returnValue['PhysicalResourceId'] = S3Guid
-    return returnValue 
-
+    returnDict = {'TemplateS3Url': 'https://' + S3Bucket + '.s3.amazonaws.com/' + S3FileName }
+    returnObj = ResponseObject(data=returnDict,physicalResourceId=S3Guid)
+    return returnObj

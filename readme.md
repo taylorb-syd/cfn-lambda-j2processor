@@ -15,8 +15,6 @@ It is important to note that as `HarnessLiterals` and `CommaLists` are both opti
 
 Also note that at this time there is no way to escape the commas in `CommaLists`. I may add this functionality if it is requested.
 
-Credit to [@gene1wood](https://github.com/gene1wood) for the original code to cfnlambda.py. Due to some changes with Lambda and CloudFomartion since this was written I had to fork the library. I may in future attempt to get these changes pushed back into his repo, or ask if he would like me to take of maintaince of the library since there seem to be some outstanding issues.
-
 ## Setup
 Run `./setup.sh` to create the zip code you will need to upload to S3 and reference using your LambdaFunction. Please see the example for further information.
 
